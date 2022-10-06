@@ -12,10 +12,8 @@ services:
     restart: always
 
     environment:
-      # - MAIL_DOMAIN=mailer.example.com
-      # - SMTP_USER=auth@mailer.example.com:01234567890123456789
-      - MAIL_DOMAIN=mailer.yyy.zzz
-      - SMTP_USER=auth@mailer.yyy.zzz:01234567890123456789
+      MAIL_DOMAIN: mailer.example.com
+      SMTP_USER: auth@mailer.example.com:01234567890123456789
 
     ports:
       - "25:25"

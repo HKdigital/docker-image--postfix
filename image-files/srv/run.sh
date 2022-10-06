@@ -16,6 +16,15 @@
 #       questions/885828/is-there-any-way-to-run-postfix-in-foreground
 #
 
+# ........................................... Expand _FILE environment variables
+
+#
+# Expand environment variables that end with _FILE
+#
+source ./expand-file-environment-vars.sh
+
+# .................................................................... Variables
+
 MAIL_DOMAIN=${MAIL_DOMAIN:=example.com}
 MAIL_HOST=${MAIL_HOST:-$MAIL_DOMAIN}
 SMTP_USER=${SMTP_USER:=user:password}

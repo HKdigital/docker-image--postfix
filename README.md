@@ -40,7 +40,7 @@ services:
       - ./volumes/postfix/domainkeys:/etc/opendkim/domainkeys
 ```
 
-### Test de mail server (telnet example)
+### Test the mail server (telnet example)
 
 You can use telnet to test the server and to see how it actually works.
 
@@ -60,9 +60,9 @@ cGFzc3dvcmQK
 telnet localhost 25
 
 AUTH LOGIN
-# 234 ..
+# 334 ..
 ZnJvbUBtYWlsZXIueXl5Lnp6eg==    # <= encoded username
-# 234 ..
+# 334 ..
 MDEyMzQ1Njc4OTAxMjM0NTY3ODk=    # <= encoded password
 # 235 2.7.0 Authentication successful
 
