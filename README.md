@@ -71,6 +71,8 @@ HELO mailer.yyy.zzz
 MAIL FROM: from@mailer.yyy.zzz
 RCPT TO: to@yyy.zzz
 DATA
+from: 'John Doe'<john.doe@example.com>
+to: 'John Doe'<john.doe@example.com>
 subject: test
 Hello!
 .
