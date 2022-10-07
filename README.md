@@ -98,13 +98,39 @@ Note [SPF records MUST be published as a DNS TXT](https://www.rfc-editor.org/rfc
 
 ### DKIM
 
-#### Generate DKIM signature
+#### Generate DKIM signature using online service
 
-You can use an online service. E.g. https://tools.socketlabs.com/dkim/generator
+You can use an online service, e.g. https://tools.socketlabs.com/dkim/generator to test.
 
 Specify the domain name to mail from. The default (name of the) key selector used in this container is `mail`.
 
 More info about DKIM [Create a DKIM record](https://dmarcian.com/create-a-dkim-record/).
+
+#### DKIM generation using OpenSSL
+
+Because a private key will be generated, it's safer to generate the DKIM keys offline using e.g. `openssl`.
+
+##### Generate private key using OpenSSL
+
+```bash
+openssl genrsa -out mail.private 2048
+````
+
+##### Create the DNS record
+
+Choose the DKIM selector: `mail`
+
+This implies that the DNS TXT record `mail._domainkey.example.com` should contain the public base 64 encoded DKIM key.
+
+Generate the contents of the record:
+
+```bash
+echo -n "v=DKIM1; k=rsa; " > mail.txt && 
+openssl rsa -in mail.private -pubout -outform der 2>/dev/null | openssl base64 -A >> mail.txt &&
+echo "" >> mail.txt
+```
+
+@see [How to create a DKIM record with OpenSSL](https://www.mailhardener.com/kb/how-to-create-a-dkim-record-with-openssl)
 
 #### Place the private key in a container volume
 
