@@ -13,11 +13,20 @@ services:
 
     environment:
       MAIL_DOMAIN: mailer.example.com
-      # SMTP_USERNAME: auth@mailer.example.com
+      # SMTP_USER: auth@mailer.example.com
       SMTP_PASSWORD: 12345
       # DKIM_SELECTOR: mail
 
     ports:
+      #
+      # When mapping ports in the HOST:CONTAINER format,
+      # you may experience erroneous results when using a container port
+      # lower than 60, because YAML parses numbers in the format xx:yy
+      # as a base-60 value. For this reason, we recommend always explicitly
+      # specifying your port mappings as strings.
+      #
+      # @see https://docs.docker.com/compose/compose-file/compose-file-v3/#ports
+      #
       - "25:25"
 
     #

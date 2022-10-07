@@ -34,9 +34,9 @@ if [ -z "${MAIL_HOST}" ]; then
     MAIL_HOST="mail-server.${MAIL_DOMAIN}"
 fi
 
-if [ -z "${SMTP_USERNAME}" ]; then
+if [ -z "${SMTP_USER}" ]; then
 
-    SMTP_USERNAME="auth@${MAIL_DOMAIN}"
+    SMTP_USER="auth@${MAIL_DOMAIN}"
 fi
 
 if [ -z "${SMTP_PASSWORD}" ]; then
@@ -44,7 +44,7 @@ if [ -z "${SMTP_PASSWORD}" ]; then
   exit 1
 fi
 
-SMTP_USER="${SMTP_USERNAME}:${SMTP_PASSWORD}"
+SMTP_HT_USERNAME_PASSWORD="${SMTP_USER}:${SMTP_PASSWORD}"
 
 DKIM_SELECTOR=${DKIM_SELECTOR:=mail}
 
@@ -149,7 +149,7 @@ mech_list: PLAIN LOGIN CRAM-MD5 DIGEST-MD5 NTLM
 EOF
 
 # sasldb2
-echo ${SMTP_USER} | tr , \\n > /tmp/passwd
+echo ${SMTP_HT_USERNAME_PASSWORD} | tr , \\n > /tmp/passwd
 while IFS=':' read -r _user _pwd; do
   echo $_pwd | saslpasswd2 -p -c -u ${MAIL_HOST} $_user
 done < /tmp/passwd

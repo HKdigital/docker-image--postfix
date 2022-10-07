@@ -35,7 +35,16 @@ services:
       SMTP_PASSWORD: 12345
 
     ports:
-      - "25:25"  # @note 25:25 does not work, quoting needed!?
+      #
+      # When mapping ports in the HOST:CONTAINER format,
+      # you may experience erroneous results when using a container port
+      # lower than 60, because YAML parses numbers in the format xx:yy
+      # as a base-60 value. For this reason, we recommend always explicitly
+      # specifying your port mappings as strings.
+      #
+      # @see https://docs.docker.com/compose/compose-file/compose-file-v3/#ports
+      #
+      - "25:25"
                 
     volumes:
       - ./volumes/postfix/domainkeys:/etc/opendkim/domainkeys
@@ -67,8 +76,6 @@ YXV0aEBtYWlsZXIuZXhhbXBsZS5jb20=
 MTIzNDU=
 # 235 2.7.0 Authentication successful
 
-
-HELO mailer.yyy.zzz
 MAIL FROM: from@mailer.yyy.zzz
 RCPT TO: to@yyy.zzz
 DATA
