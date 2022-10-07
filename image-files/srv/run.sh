@@ -25,10 +25,29 @@ source ./expand-file-environment-vars.sh
 
 # .................................................................... Variables
 
-MAIL_DOMAIN=${MAIL_DOMAIN:=example.com}
-MAIL_HOST=${MAIL_HOST:-$MAIL_DOMAIN}
-SMTP_USER=${SMTP_USER:=user:password}
+if [ -z "${MAIL_DOMAIN}" ]; then
+  echo "Missing environment parameter [MAIL_DOMAIN]"
+  exit 1
+fi
+
+if [ -z "${MAIL_HOST}" ]; then
+    MAIL_HOST="mailer.${MAIL_DOMAIN}"
+fi
+
+if [ -z "${SMTP_USERNAME}" ]; then
+
+    SMTP_USERNAME="auth@${MAIL_DOMAIN}"
+fi
+
+if [ -z "${SMTP_PASSWORD}" ]; then
+  echo "Missing environment parameter [SMTP_PASSWORD]"
+  exit 1
+fi
+
+SMTP_USER="${SMTP_USERNAME}:${SMTP_PASSWORD}"
+
 DKIM_SELECTOR=${DKIM_SELECTOR:=mail}
+
 
 echo
 echo "Running [run.sh] from image [hkdigital/postfix]"
@@ -115,7 +134,7 @@ postconf -e maillog_file=/var/log/mail.log
 
 echo '0 0 * * * root echo "" > /var/log/mail.log' > /etc/cron.d/maillog
 
-# SASL
+# ========================================================================= SASL
 
 # /etc/postfix/main.cf
 postconf -e smtpd_sasl_auth_enable=yes
@@ -136,7 +155,7 @@ while IFS=':' read -r _user _pwd; do
 done < /tmp/passwd
 chown postfix.sasl /etc/sasldb2
 
-# TLS
+# ========================================================================== TLS
 
 CRT_FILE=/etc/postfix/certs/${MAIL_HOST}.crt
 KEY_FILE=/etc/postfix/certs/${MAIL_HOST}.key
@@ -159,7 +178,18 @@ postconf -P "submission/inet/smtpd_recipient_restrictions=permit_sasl_authentica
 
 fi
 
-# DKIM
+# ========================================================================= DKIM
+#
+# The domainkeys folder could contain two files:
+#
+# - mail.private    <= private key
+# - mail.txt        <= public key
+#
+# Where `mail` is the specified DKIM_SELECTOR
+#
+# Check out the Internet about how to generate a DKIM key pair and how to
+# configure DNS.
+#
 
 touch /var/log/syslog
 
@@ -232,15 +262,15 @@ cat > /etc/opendkim/SigningTable <<EOF
 EOF
 
 for kf in ${KEY_FILES}; do
-if [[ "${kf}" != "${DKIM_FILE}" ]]; then
-kfn="${kf##*._domainkey.}"
-DKIM_DOMAIN="${kfn%.private}"
-kfs="${kf%%._domainkey.*}"
-DKIM_SELECTOR="${kfs##*/}"
-echo "${DKIM_DOMAIN}" >> /etc/opendkim/TrustedHosts
-echo "${DKIM_SELECTOR}._domainkey.${DKIM_DOMAIN} ${DKIM_DOMAIN#\*.}:${DKIM_SELECTOR}:${kf}" >> /etc/opendkim/KeyTable
-echo "*@${DKIM_DOMAIN} ${DKIM_SELECTOR}._domainkey.${DKIM_DOMAIN}" >> /etc/opendkim/SigningTable
-fi
+  if [[ "${kf}" != "${DKIM_FILE}" ]]; then
+    kfn="${kf##*._domainkey.}"
+    DKIM_DOMAIN="${kfn%.private}"
+    kfs="${kf%%._domainkey.*}"
+    DKIM_SELECTOR="${kfs##*/}"
+    echo "${DKIM_DOMAIN}" >> /etc/opendkim/TrustedHosts
+    echo "${DKIM_SELECTOR}._domainkey.${DKIM_DOMAIN} ${DKIM_DOMAIN#\*.}:${DKIM_SELECTOR}:${kf}" >> /etc/opendkim/KeyTable
+    echo "*@${DKIM_DOMAIN} ${DKIM_SELECTOR}._domainkey.${DKIM_DOMAIN}" >> /etc/opendkim/SigningTable
+  fi
 done
 
 chown opendkim:opendkim /etc/opendkim/domainkeys
@@ -252,7 +282,7 @@ echo '0 0 * * * root echo "" > /var/log/syslog' > /etc/cron.d/syslog
 
 fi
 
-# Fail2ban
+# ===================================================================== Fail2ban
 
 if [[ -n "${FAIL2BAN}" ]]; then
 

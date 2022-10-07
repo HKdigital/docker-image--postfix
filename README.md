@@ -30,8 +30,9 @@ services:
     restart: always
 
     environment:
-      - MAIL_DOMAIN=mailer.yyy.zzz
-      - SMTP_USER=auth@mailer.yyy.zzz:01234567890123456789
+      MAIL_DOMAIN: mailer.example.com
+      SMTP_USER: auth@mailer.example.com
+      SMTP_PASSWORD: 12345
 
     ports:
       - "25:25"  # @note 25:25 does not work, quoting needed!?
@@ -48,22 +49,22 @@ However, just using a mail client is easier...
 
 ```bash
 # Convert your username (email) to base64 (use quotes to prevent issues)
-$ echo -en "<username>" | base64
-ZnJvbUBtYWlsZXIueXl5Lnp6eg==
+$ echo -en "auth@mailer.example.com" | base64
+YXV0aEBtYWlsZXIuZXhhbXBsZS5jb20=
 
 # Convert your password to Base 64 (use quotes to prevent issues)
-$ echo -en "<password>" | base64
-cGFzc3dvcmQK
-
-# 01234567890123456789 => MDEyMzQ1Njc4OTAxMjM0NTY3ODk=
+$ echo -en "12345" | base64
+MTIzNDU=
 
 telnet localhost 25
 
 AUTH LOGIN
 # 334 ..
-ZnJvbUBtYWlsZXIueXl5Lnp6eg==    # <= encoded username
+# encoded username =>
+YXV0aEBtYWlsZXIuZXhhbXBsZS5jb20=
 # 334 ..
-MDEyMzQ1Njc4OTAxMjM0NTY3ODk=    # <= encoded password
+# encoded password =>
+MTIzNDU=
 # 235 2.7.0 Authentication successful
 
 

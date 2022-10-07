@@ -6,25 +6,39 @@ services:
     #
     # @see https://hub.docker.com/r/hkdigital/postfix
     #
-    #image: hkdigital/postfix
-    image: hkdigital-postfix
+    image: hkdigital/postfix
+    # image: hkdigital-postfix    # run `build-latest-image.sh` first
 
-    restart: always
+    restart: "no"
 
     environment:
       MAIL_DOMAIN: mailer.example.com
-      SMTP_USER: auth@mailer.example.com:01234567890123456789
+      # SMTP_USERNAME: auth@mailer.example.com
+      SMTP_PASSWORD: 12345
+      # DKIM_SELECTOR: mail
 
     ports:
       - "25:25"
 
     #
-    #  Add extra host names to the containers interface configuration
-    # https://github.com/compose-spec/compose-spec/blob/master/spec.md#extra_hosts    
+    # The domainkeys folder could contain two files:
+    #
+    # - mail.private    <= private key
+    # - mail.txt        <= public key
+    #
+    # Where `mail` is the specified DKIM_SELECTOR
+    #
+    # Check out the Internet about how to generate a DKIM key pair and how to
+    # configure DNS.
+    #
+    volumes:
+      - ./volumes/domainkeys:/etc/opendkim/domainkeys
+
+    #
+    # To add extra host names to the containers interface configuration:
+    #
+    # @see https://github.com/compose-spec/compose-spec/blob/master/spec.md#extra_hosts
     #
     # extra_hosts:
     #   - "some-dynamic-host.duckdns.org:127.0.0.1"
     #
-
-    volumes:
-      - ./volumes/domainkeys:/etc/opendkim/domainkeys
