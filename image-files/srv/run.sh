@@ -31,7 +31,7 @@ if [ -z "${MAIL_DOMAIN}" ]; then
 fi
 
 if [ -z "${MAIL_HOST}" ]; then
-    MAIL_HOST="mail-server.${MAIL_DOMAIN}"
+    MAIL_HOST="smtp.${MAIL_DOMAIN}"
 fi
 
 if [ -z "${SMTP_USER}" ]; then

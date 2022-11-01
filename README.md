@@ -132,7 +132,7 @@ This implies that the DNS TXT record `mail._domainkey.example.com` should contai
 Generate the contents of the record:
 
 ```bash
-echo -n "v=DKIM1; k=rsa; " > mail.txt && 
+echo -n "v=DKIM1; k=rsa; p=" > mail.txt && 
 openssl rsa -in mail.private -pubout -outform der 2>/dev/null | openssl base64 -A >> mail.txt &&
 echo "" >> mail.txt
 ```
@@ -153,6 +153,9 @@ After generating the signarure add the public part to your DNS.
 
 This record will give receivers the posibility to check if the message was signed by your mailserver.
 
+#### Inspect your DNS DKIM record
+
+Use an inspector like [this one](https://dmarcian.com/dkim-inspector/) to check if the DKIM record is valid.
 
 ### Double check your mail server configuration
 
